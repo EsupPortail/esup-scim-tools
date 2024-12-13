@@ -112,10 +112,9 @@ public class ScimRequestResponseLogger extends OncePerRequestFilter {
         for(SseEmitter emitter : emitters) {
             try {
                 emitter.send(event);
-            } catch (Exception e) {
-                log.debug("Error sending event to emitter {}", emitter, e);
+            } catch (Throwable t) {
+                log.debug("Error sending event to emitter {}", emitter, t);
                 deadEmitters.add(emitter);
-                throw new RuntimeException(e);
             }
         }
         emitters.removeAll(deadEmitters);
