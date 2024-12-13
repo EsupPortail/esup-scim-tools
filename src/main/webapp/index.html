@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ESUP-SCIM-PROXU</title>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/htmx.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+</head>
+<body>
+
+<h1>Logs SCIM</h1>
+
+<pre hx-ext="sse" sse-connect="/stream-scim-logs" sse-swap="scimlogs" hx-swap="afterbegin textContent">
+</pre>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.Customizer;
@@ -26,6 +27,7 @@ import java.util.List;
         prePostEnabled = true,
         securedEnabled = true,
         jsr250Enabled = true)
+@EnableAsync
 public class WebSecurityConfig {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
