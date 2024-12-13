@@ -26,9 +26,11 @@ public class ScimRequestResponseLogger extends OncePerRequestFilter {
 
     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    JsonPrettyPrinter jsonPrettyPrinter = new JsonPrettyPrinter();
+
     Set<SseEmitter> emitters = new HashSet<>();
     
-    private final int maxPayloadLength = 1000;
+    private final int maxPayloadLength = 1000000;
 
     public SseEmitter getEmitter() {
         SseEmitter emitter = new SseEmitter(-1L);
@@ -94,10 +96,12 @@ public class ScimRequestResponseLogger extends OncePerRequestFilter {
 
     private void sendSseEvent(String requestPath, String requestBody, int responseStatus, String responseBody, long duration) {
         String requestWellFormed = String.format("Request: %s", requestPath);
+        String requestBodyJsonFormatted = jsonPrettyPrinter.prettyPrint(requestBody);
         if(requestBody.length() > 0) {
-            requestWellFormed += String.format("\n%s", requestBody);
+            requestWellFormed += String.format("\n%s", requestBodyJsonFormatted);
         }
-        String responseWellFormed = String.format("Response: %d\n%s", responseStatus, responseBody);
+        String responseBodyJsonFormatted = jsonPrettyPrinter.prettyPrint(responseBody);
+        String responseWellFormed = String.format("Response: %d\n%s", responseStatus, responseBodyJsonFormatted);
         String date = dateFormat.format(System.currentTimeMillis());
         String requestResponse = String.format("%s - %s ms\n%s\n%s\n\n", date, duration, requestWellFormed, responseWellFormed);
         SseEmitter.SseEventBuilder event = SseEmitter.event()
