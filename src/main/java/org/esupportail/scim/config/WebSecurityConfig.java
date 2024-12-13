@@ -1,4 +1,4 @@
-package org.esupportail.scim.config.security;
+package org.esupportail.scim.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
