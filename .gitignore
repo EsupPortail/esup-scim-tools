@@ -1,0 +1,9 @@
+*
+!.gitignore
+!src/
+!src/**
+!LICENSE
+!README.md
+!NOTICE
+!pom.xml
+!.gitlab-ci.yml
