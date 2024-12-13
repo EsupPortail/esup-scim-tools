@@ -14,7 +14,7 @@ public class JsonPrettyPrinter {
         try {
             Object jsonObject = objectMapper.readValue(uglyJsonString, Object.class);
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
-        } catch (JsonProcessingException e) {
+        } catch (Throwable e) {
             log.warn("Failed to pretty print JSON : {}", uglyJsonString, e);
             return uglyJsonString;
         }
