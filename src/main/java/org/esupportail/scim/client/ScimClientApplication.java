@@ -14,6 +14,7 @@ import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.spec.patch.PatchOperation;
+import org.apache.directory.scim.spec.patch.PatchOperationPath;
 import org.apache.directory.scim.spec.resources.Email;
 import org.apache.directory.scim.spec.resources.GroupMembership;
 import org.apache.directory.scim.spec.resources.ScimGroup;
@@ -82,8 +83,8 @@ public class ScimClientApplication {
         ListResponse<ScimGroup> listResponseGroups = scimGroupClient.query(null, null, null, null, null, null, null);
         log.info("Groups on server : {}", listResponseGroups);
 
-        for(ScimGroup group : fakedGroups.values()) {
-            if(listResponseGroups.getTotalResults()==0 || listResponseGroups.getResources().stream().noneMatch(g -> g.getId().equals(group.getId()))) {
+        for (ScimGroup group : fakedGroups.values()) {
+            if (listResponseGroups.getTotalResults() == 0 || listResponseGroups.getResources().stream().noneMatch(g -> g.getId().equals(group.getId()))) {
                 ScimGroup createdGroup = scimGroupClient.create(group);
                 log.info("Created group : {}", createdGroup);
             }
@@ -92,19 +93,39 @@ public class ScimClientApplication {
         ScimUserClient scimUserClient = new ScimUserClient(client, scimUrl);
         ListResponse<ScimUser> listResponseUsers = scimUserClient.query(null, null, null, null, null, null, null);
         log.info("Users on server : {}", listResponseGroups);
-        for(ScimUser user : fakedUsers.values()) {
-            if(listResponseUsers.getTotalResults()==0 || listResponseUsers.getResources().stream().noneMatch(u -> u.getId().equals(user.getId()))) {
+        for (ScimUser user : fakedUsers.values()) {
+            if (listResponseUsers.getTotalResults() == 0 || listResponseUsers.getResources().stream().noneMatch(u -> u.getId().equals(user.getId()))) {
                 ScimUser createdUser = scimUserClient.create(user);
                 log.info("Created user : {}", createdUser);
             }
         }
 
-        for(ScimGroup fakedGroup : fakedGroups.values()) {
+        for (ScimGroup fakedGroup : fakedGroups.values()) {
             Optional<ScimGroup> scimGroup = scimGroupClient.getById(fakedGroup.getId());
-            if(scimGroup.isPresent()) {
+            if (scimGroup.isPresent()) {
                 PatchGenerator patchGenerator = new PatchGenerator(schemaRegistry);
                 List<PatchOperation> patchOperations = patchGenerator.diff(scimGroup.get(), fakedGroup);
-                if(!patchOperations.isEmpty()) {
+                if (!patchOperations.isEmpty() && patchOperations.get(0).getPath().toString().equals("members")) {
+                    // Hack on patchOperations to group operations add, remove, replace
+                    Map<PatchOperation.Type, Set<GroupMembership>> members = new HashMap<>();
+                    for (PatchOperation patchOperation : patchOperations) {
+                        members.putIfAbsent(patchOperation.getOperation(), new HashSet<>());
+                        Set<GroupMembership> membersFromPatchOriginal = (Set<GroupMembership>) patchOperation.getValue();
+                        members.get(patchOperation.getOperation()).addAll(membersFromPatchOriginal);
+                    }
+                    Map<PatchOperation.Type, PatchOperation> cleanPatchOperationsMembers = new HashMap<>();
+                    for (PatchOperation.Type type : PatchOperation.Type.values()) {
+                        if(members.get(type)!=null && !members.get(type).isEmpty()) {
+                            PatchOperation patchOperation = new PatchOperation();
+                            patchOperation.setOperation(type);
+                            patchOperation.setPath(PatchOperationPath.fromString("members"));
+                            patchOperation.setValue(members.get(type));
+                            cleanPatchOperationsMembers.put(type, patchOperation);
+                        }
+                    }
+                    patchOperations = new ArrayList<>(cleanPatchOperationsMembers.values());
+                }
+                if (!patchOperations.isEmpty()) {
                     PatchRequest patchRequest = new PatchRequest();
                     patchRequest.setPatchOperationList(patchOperations);
                     ScimGroup updatedGroup = scimGroupClient.patch(fakedGroup.getId(), patchRequest);
