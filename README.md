@@ -2,7 +2,7 @@
 
 ## Description
 
-ESUP-SCIM-TOOLS is 
+ESUP-SCIM-TOOLS is some tools to test SCIM servers and clients. It is composed of :
 * a Java application that runs as a SCIM server and memorizes users and groups in memory
 * a SCIM client that connects to a SCIM server and generate / provides some groups and users to put in the SCIM server.
 
