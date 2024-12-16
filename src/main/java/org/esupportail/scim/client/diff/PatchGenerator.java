@@ -206,7 +206,7 @@ public class PatchGenerator {
           patchOperations.add(new PatchOperation()
             .setOperation(PatchOperation.Type.REMOVE)
             .setPath(new PatchOperationPath(attributeExpression(prefixSchema, parentAttributes, attribute)))
-            .setValue(item));
+            .setValue(Set.of(item)));
         });
       } else {
         // Empty List, remove attribute
@@ -228,7 +228,7 @@ public class PatchGenerator {
         patchOperations.add(new PatchOperation()
           .setOperation(PatchOperation.Type.ADD)
           .setPath(new PatchOperationPath(attributeExpression(prefixSchema, parentAttributes, attribute)))
-          .setValue(item));
+          .setValue(Set.of(item)));
       });
     }
 
