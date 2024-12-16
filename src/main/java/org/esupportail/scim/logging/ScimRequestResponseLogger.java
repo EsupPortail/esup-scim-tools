@@ -4,6 +4,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.hc.client5.http.utils.Base64;
+import org.esupportail.scim.web.ScimRequestResponseLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -16,6 +19,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -75,7 +79,7 @@ public class ScimRequestResponseLogger extends OncePerRequestFilter {
 
 
 
-            String requestBody = this.getContentAsString(wrappedRequest.getContentAsByteArray(), this.maxPayloadLength, request.getCharacterEncoding());
+            String requestBody = new String(wrappedRequest.getContentAsByteArray());
             if (requestBody.length() > 0) {
                 log.info("   Request body:\n" + requestBody);
             }
@@ -83,27 +87,24 @@ public class ScimRequestResponseLogger extends OncePerRequestFilter {
             int responseStatus = response.getStatus();
             log.info("<= " + reqInfo + ": returned status=" + responseStatus + " in " + duration + "ms");
             byte[] buf = wrappedResponse.getContentAsByteArray();
-            String responseBody = this.getContentAsString(buf, this.maxPayloadLength, response.getCharacterEncoding());
+            String responseBody = new String(buf);
             log.info("   Response body:\n" + responseBody);
 
             // IMPORTANT: copy content of response back into original response
             wrappedResponse.copyBodyToResponse();
 
-            sendSseEvent(reqInfo.toString(), requestBody, responseStatus, responseBody, duration);
+            ScimRequestResponseLog requestResponse = new ScimRequestResponseLog(new Date(),
+                    duration,
+                    reqInfo.toString(),
+                    jsonPrettyPrinter.prettyPrint(requestBody),
+                    responseStatus,
+                    jsonPrettyPrinter.prettyPrint(responseBody));
+            sendSseEvent(requestResponse);
 
         }
     }
 
-    private void sendSseEvent(String requestPath, String requestBody, int responseStatus, String responseBody, long duration) {
-        String requestWellFormed = String.format("Request: %s", requestPath);
-        String requestBodyJsonFormatted = jsonPrettyPrinter.prettyPrint(requestBody);
-        if(requestBody.length() > 0) {
-            requestWellFormed += String.format("\n%s", requestBodyJsonFormatted);
-        }
-        String responseBodyJsonFormatted = jsonPrettyPrinter.prettyPrint(responseBody);
-        String responseWellFormed = String.format("Response: %d\n%s", responseStatus, responseBodyJsonFormatted);
-        String date = dateFormat.format(System.currentTimeMillis());
-        String requestResponse = String.format("%s - %s ms\n%s\n%s\n\n", date, duration, requestWellFormed, responseWellFormed);
+    private void sendSseEvent(ScimRequestResponseLog requestResponse) {
         SseEmitter.SseEventBuilder event = SseEmitter.event()
                     .data(requestResponse)
                     .id(String.valueOf(System.currentTimeMillis()))

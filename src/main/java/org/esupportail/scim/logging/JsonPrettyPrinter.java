@@ -11,6 +11,9 @@ public class JsonPrettyPrinter {
     ObjectMapper objectMapper = new ObjectMapper();
 
     public String prettyPrint(String uglyJsonString) {
+        if(uglyJsonString==null || uglyJsonString.isBlank()) {
+            return "";
+        }
         try {
             Object jsonObject = objectMapper.readValue(uglyJsonString, Object.class);
             return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(jsonObject);
