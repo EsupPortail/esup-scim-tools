@@ -1,4 +1,4 @@
-package org.esupportail.scim.service.mock;
+package org.esupportail.scim.server.service.mock;
 
 import org.apache.directory.scim.spec.filter.Filter;
 import org.apache.directory.scim.spec.filter.PageRequest;
@@ -7,14 +7,13 @@ import org.apache.directory.scim.spec.patch.PatchOperation;
 import org.apache.directory.scim.spec.resources.GroupMembership;
 import org.apache.directory.scim.spec.resources.ScimGroup;
 import org.apache.directory.scim.spec.resources.ScimUser;
-import org.esupportail.scim.service.ScimServerRepositoryService;
+import org.esupportail.scim.server.service.ScimServerRepositoryService;
 import org.slf4j.Logger;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Component
 public class MockScimServerRepositoryService implements ScimServerRepositoryService {

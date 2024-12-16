@@ -1,6 +1,5 @@
-package org.esupportail.scim.logging;
+package org.esupportail.scim.server.logging;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 

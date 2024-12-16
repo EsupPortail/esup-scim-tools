@@ -1,4 +1,4 @@
-package org.esupportail.scim;
+package org.esupportail.scim.server;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.util.StopWatch;

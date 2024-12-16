@@ -1,4 +1,4 @@
-package org.esupportail.scim.service;
+package org.esupportail.scim.server.service;
 
 import org.apache.directory.scim.spec.filter.Filter;
 import org.apache.directory.scim.spec.filter.PageRequest;

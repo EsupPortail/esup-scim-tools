@@ -1,12 +1,10 @@
-package org.esupportail.scim.logging;
+package org.esupportail.scim.server.logging;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.hc.client5.http.utils.Base64;
-import org.esupportail.scim.web.ScimRequestResponseLog;
+import org.esupportail.scim.server.web.ScimRequestResponseLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

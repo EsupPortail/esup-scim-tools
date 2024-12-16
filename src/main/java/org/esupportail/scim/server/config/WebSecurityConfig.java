@@ -1,4 +1,4 @@
-package org.esupportail.scim.config;
+package org.esupportail.scim.server.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

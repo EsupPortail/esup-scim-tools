@@ -1,13 +1,13 @@
-package org.esupportail.scim;
+package org.esupportail.scim.server;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ScimProxyApplication {
+public class ScimWebserverApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(ScimProxyApplication.class, args);
+        SpringApplication.run(ScimWebserverApplication.class, args);
     }
 
 }

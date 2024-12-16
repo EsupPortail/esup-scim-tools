@@ -1,7 +1,6 @@
-package org.esupportail.scim.web;
+package org.esupportail.scim.server.web;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 

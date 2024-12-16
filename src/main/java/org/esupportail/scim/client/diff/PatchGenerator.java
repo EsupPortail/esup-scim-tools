@@ -21,7 +21,7 @@
 *
 */
 
-package org.esupportail.scim.diff;
+package org.esupportail.scim.client.diff;
 
 import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.spec.filter.AttributeComparisonExpression;

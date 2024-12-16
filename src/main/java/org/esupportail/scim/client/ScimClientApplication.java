@@ -1,4 +1,4 @@
-package org.esupportail.scim.bash;
+package org.esupportail.scim.client;
 
 
 import com.github.javafaker.Faker;
@@ -12,15 +12,12 @@ import org.apache.directory.scim.client.rest.ScimUserClient;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.protocol.data.PatchRequest;
-import org.apache.directory.scim.protocol.data.SearchRequest;
-import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
 import org.apache.directory.scim.spec.patch.PatchOperation;
 import org.apache.directory.scim.spec.resources.Email;
 import org.apache.directory.scim.spec.resources.GroupMembership;
 import org.apache.directory.scim.spec.resources.ScimGroup;
 import org.apache.directory.scim.spec.resources.ScimUser;
-import org.apache.directory.scim.spec.schema.Schemas;
-import org.esupportail.scim.diff.PatchGenerator;
+import org.esupportail.scim.client.diff.PatchGenerator;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jdk.connector.JdkConnectorProvider;
@@ -28,24 +25,29 @@ import org.slf4j.Logger;
 
 import java.util.*;
 
-public class ScimClientFakeUsers {
+public class ScimClientApplication {
 
-    final static Logger log = org.slf4j.LoggerFactory.getLogger(ScimClientFakeUsers.class);
+    final static Logger log = org.slf4j.LoggerFactory.getLogger(ScimClientApplication.class);
 
     final static String SCIM_URL = "http://localhost:8080/scim2";
+
+    static String SCIM_USER = "scim";
+
+    static String SCIM_PASSWORD = "esup";
 
     static Map<String, ScimGroup> fakedGroups = new HashMap<>();
 
     static Map<String, ScimUser> fakedUsers = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
+
         preloadFakedData();
 
         SchemaRegistry schemaRegistry = new SchemaRegistry();
         schemaRegistry.addSchema(ScimUser.class, null);
         schemaRegistry.addSchema(ScimGroup.class, null);
 
-        HttpAuthenticationFeature basicAuthFeature = HttpAuthenticationFeature.basic("scim", "esup");
+        HttpAuthenticationFeature basicAuthFeature = HttpAuthenticationFeature.basic(SCIM_USER, SCIM_PASSWORD);
         Client client = ClientBuilder.newBuilder()
                 .withConfig( // the default Jersey client does not support PATCH requests
                         new ClientConfig().connectorProvider(new JdkConnectorProvider()))

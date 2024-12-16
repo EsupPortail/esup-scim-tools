@@ -1,4 +1,4 @@
-package org.esupportail.scim;
+package org.esupportail.scim.server;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -7,7 +7,7 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(ScimProxyApplication.class);
+        return application.sources(ScimWebserverApplication.class);
     }
 
 }
