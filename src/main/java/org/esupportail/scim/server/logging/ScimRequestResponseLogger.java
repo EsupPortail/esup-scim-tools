@@ -26,8 +26,6 @@ public class ScimRequestResponseLogger extends OncePerRequestFilter {
 
     Logger log = LoggerFactory.getLogger(ScimRequestResponseLogger.class);
 
-    DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
     JsonPrettyPrinter jsonPrettyPrinter = new JsonPrettyPrinter();
 
     Set<SseEmitter> emitters = new HashSet<>();
