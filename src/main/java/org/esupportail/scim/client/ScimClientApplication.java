@@ -3,6 +3,7 @@ package org.esupportail.scim.client;
 
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
+import jakarta.annotation.PostConstruct;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.ClientBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -22,24 +23,46 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jdk.connector.JdkConnectorProvider;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 import java.util.*;
 
+@SpringBootApplication
+@Configuration
+@PropertySource("classpath:application.properties")
 public class ScimClientApplication {
 
     final static Logger log = org.slf4j.LoggerFactory.getLogger(ScimClientApplication.class);
 
-    final static String SCIM_URL = "http://localhost:8080/scim2";
+    @Value("${spring.jersey.application-path}")
+    String scimServerPath;
 
-    static String SCIM_USER = "scim";
+    @Value("${scim.server:http://localhost:8080}")
+    String scimServer;
 
-    static String SCIM_PASSWORD = "esup";
+    @Value("${scim.username}")
+    String scimUsername;
+
+    @Value("${scim.password}")
+    String scimPassword;
 
     static Map<String, ScimGroup> fakedGroups = new HashMap<>();
 
     static Map<String, ScimUser> fakedUsers = new HashMap<>();
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        log.info("Starting...");
+        SpringApplication.run(ScimClientApplication.class, args);
+    }
+
+    @PostConstruct
+    public void run() throws Exception {
+
+        String scimUrl = scimServer + scimServerPath;
 
         preloadFakedData();
 
@@ -47,14 +70,14 @@ public class ScimClientApplication {
         schemaRegistry.addSchema(ScimUser.class, null);
         schemaRegistry.addSchema(ScimGroup.class, null);
 
-        HttpAuthenticationFeature basicAuthFeature = HttpAuthenticationFeature.basic(SCIM_USER, SCIM_PASSWORD);
+        HttpAuthenticationFeature basicAuthFeature = HttpAuthenticationFeature.basic(scimUsername, scimPassword);
         Client client = ClientBuilder.newBuilder()
                 .withConfig( // the default Jersey client does not support PATCH requests
                         new ClientConfig().connectorProvider(new JdkConnectorProvider()))
                 .register(new ScimJacksonXmlBindJsonProvider(schemaRegistry))
                 .register(basicAuthFeature)
                 .build();
-        ScimGroupClient scimGroupClient = new ScimGroupClient(client, SCIM_URL);
+        ScimGroupClient scimGroupClient = new ScimGroupClient(client, scimUrl);
 
         ListResponse<ScimGroup> listResponseGroups = scimGroupClient.query(null, null, null, null, null, null, null);
         log.info("Groups on server : {}", listResponseGroups);
@@ -66,7 +89,7 @@ public class ScimClientApplication {
             }
         }
 
-        ScimUserClient scimUserClient = new ScimUserClient(client, SCIM_URL);
+        ScimUserClient scimUserClient = new ScimUserClient(client, scimUrl);
         ListResponse<ScimUser> listResponseUsers = scimUserClient.query(null, null, null, null, null, null, null);
         log.info("Users on server : {}", listResponseGroups);
         for(ScimUser user : fakedUsers.values()) {
